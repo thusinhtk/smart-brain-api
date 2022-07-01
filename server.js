@@ -1,9 +1,13 @@
 const express = require('express');
+const bcrypt = require('bcrypt-nodejs');
+const cors = require('cors');
+
 const app = express();
 
 // Express middleware
 app.use(express.urlencoded({extended:false}));
 app.use(express.json());
+app.use(cors());
 
 const database = {
     users:[
@@ -22,6 +26,13 @@ const database = {
             password:'cheerful',
             entries:0,
             joined: new Date()
+        }
+    ],
+    logins:[
+        {
+            id: '987',
+            hash:'',
+            email:'john@gmail.com' 
         }
     ]
 }
@@ -87,3 +98,15 @@ app.put('/image', (req, res) => {
 app.listen(3000, () => {
     console.log('app is running on port 3000');
 });
+
+
+// bcrypt.hash("bacon", null, null, function(err, hash) {
+//     // Store hash in your password DB.
+// });
+// // Load hash from your password DB.
+// bcrypt.compare("bacon", hash, function(err, res) {
+//     // res == true
+// });
+// bcrypt.compare("veggies", hash, function(err, res) {
+//     // res = false
+// });
