@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
 const knex = require('knex');
 
-const postgres = knex({
+const db = knex({
     client: 'pg', /* pg: postgreSQL */
     connection: {
         host: '127.0.0.1',
@@ -13,7 +13,6 @@ const postgres = knex({
         database: 'smart-brain'
     }
 });
-console.log(postgres.select('*').from('users'));
 
 const app = express();
 
@@ -83,18 +82,20 @@ app.post('/signin', (req, res) => {
 
 app.post('/register', (req, res) => {
     const { email, name, password } = req.body;
-    database.users.push({
-        id: Number(database.users[database.users.length - 1].id) + 1,
-        name: name,
-        email: email,
-        password: password,
-        entries: 0,
-        lasturl: '',
-        joined: new Date()
-    });
 
-    // res.status(200).json('Registered successfully');
-    res.json(database.users[database.users.length - 1]);
+    db('users')
+        .returning('*') //insert new user and return all the columns.
+        .insert({
+            name: name,
+            email: email,
+            entries: 0,
+            // lasturl: '',
+            joined: new Date()
+        })
+        .then(user => {
+            res.json(user[0]);
+        })
+        .catch(err => res.status(400).json('Unable to register'));
 });
 
 app.put('/image', (req, res) => {
